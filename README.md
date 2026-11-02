@@ -1,6 +1,6 @@
 # SMSPVA Java SDK
 
-Official Java client for [SMSPVA](https://smspva.com/), a service for receiving verification SMS, renting phone numbers and renting private email addresses. Covers all 56 methods in Activation V2 (20), Rental (22) and Private Email (14). Requires Java 17 or later and uses Jackson and Apache HttpClient 5. This is a synchronous alpha release. Alternative API is excluded.
+Official Java client for [SMSPVA](https://smspva.com/), a service for receiving verification SMS, renting phone numbers and renting private email addresses. Covers all 58 methods in Activation V2 (22), Rental (22) and Private Email (14). Requires Java 17 or later and uses Jackson and Apache HttpClient 5. This is a synchronous alpha release. Alternative API is excluded.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Add the SDK dependency to your Maven project:
 <dependency>
   <groupId>com.smspva</groupId>
   <artifactId>smspva-sdk</artifactId>
-  <version>0.1.0-alpha.1</version>
+  <version>0.1.0-alpha.2</version>
 </dependency>
 ```
 
@@ -88,7 +88,7 @@ mvn install
 
 Generation reads the bundled contract and wire fixtures, then produces typed records and methods. A standalone source checkout already includes the generated files and builds without the documentation tree.
 
-Tests cover all 56 named methods and exact wire paths, HTTP verbs, parameters, auth and returned values. Local HTTP tests verify that redirects, cookies and automatic recovery of a disconnected paid GET are disabled. No production API request or purchase is made. The alpha has not been validated against paid production operations.
+Tests cover all 58 named methods and exact wire paths, HTTP verbs, parameters, auth and returned values. Local HTTP tests verify that redirects, cookies and automatic recovery of a disconnected paid GET are disabled. No production API request or purchase is made. The alpha has not been validated against paid production operations.
 
 The transport policy follows [Apache HttpClient's retry controls](https://hc.apache.org/httpcomponents-client-5.6.x/5.6.5/httpclient5/apidocs/org/apache/hc/client5/http/impl/classic/HttpClientBuilder.html); JSON handling uses [Jackson](https://github.com/FasterXML/jackson).
 
@@ -101,3 +101,17 @@ MIT. See [LICENSE](https://github.com/SMSPVA/smspva-java/blob/main/LICENSE).
 Read the [SMSPVA API documentation](https://docs.smspva.com/) for parameters, response codes and workflows. Country, service and provider lists come from the live API. SMSPVA supports [phone number rentals](https://smspva.com/rent) and [private email rentals](https://smspva.com/rent-mail.html); availability and prices can change.
 
 For account or billing questions, visit the [SMSPVA help center](https://smspva.com/help.html). Report SDK bugs through [GitHub issues](https://github.com/SMSPVA/smspva-java/issues), without API keys or private message content.
+
+## Compact number counts and operator ratings
+
+Using an already configured client:
+
+```java
+var allCounts = client.activation().getAllNumberCountsCompact();
+var uaCounts = client.activation().getCountryNumberCountsCompact(
+    new Requests.ActivationGetCountryNumberCountsCompact("ua"));
+```
+
+Both requests use GET and the account API key in the `apikey` header. Country codes are case-insensitive; an unknown country returns `data: []`. No extra query parameters are required. Results are cached by the API for 60 seconds, independently for all countries and for each country.
+
+The SDK preserves `Operator`, `Country`, `Services`, `Rating` and `ServiceRatings` exactly as returned, including negative counts and missing or invalid ratings. It does not insert computed rating fields. For non-`Donor*` operators, the effective rating is 1. For `Donor*` operators, use a service rating if it is an integer from 1 to 10, then a valid overall rating; otherwise the rating is undefined. Lower is better.

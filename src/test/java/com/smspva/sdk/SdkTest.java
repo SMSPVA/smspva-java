@@ -54,7 +54,7 @@ class SdkTest {
         }
         return (JsonNode)resource.getClass().getMethod(method,request).invoke(resource,request.getDeclaredConstructor(types).newInstance(values));
     }
-    @Test void all56NamedMethodsPreserveWireAndJsonValues() throws Exception {
+    @Test void all58NamedMethodsPreserveWireAndJsonValues() throws Exception {
         Fake http=new Fake(); JsonNode contracts=contracts();
         try(SmsPva client=new SmsPva(SECRET,Duration.ofSeconds(30),http,Map.of())) {
             for(JsonNode item:cases()) {
@@ -79,7 +79,7 @@ class SdkTest {
                 assertEquals(item.get("family").asText().equals("activation") && auth?SECRET:null,request.headers().get("apikey"));
                 assertFalse(request.toString().contains(SECRET));
             }
-            assertEquals(56,http.requests.size());
+            assertEquals(58,http.requests.size());
         }
     }
     @Test void pendingAndNoStockRemainNormalResults() {
