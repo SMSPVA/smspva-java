@@ -28,6 +28,13 @@ public final class Requests {
             return values;
         }
     }
+    public record ActivationGetCountryNumberCountsCompact(String country) implements Params {
+        public Map<String,Object> toMap() {
+            Map<String,Object> values=new LinkedHashMap<>();
+            values.put("country", country);
+            return values;
+        }
+    }
     public record ActivationGetServicePrice(String country, String service, Long voice) implements Params {
         public Map<String,Object> toMap() {
             Map<String,Object> values=new LinkedHashMap<>();

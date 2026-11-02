@@ -30,6 +30,13 @@ public final class Activation {
         if(params==null) throw new ValidationException("Request parameters must not be null");
         return transport.request("activation.getCountryNumberCounts", params.toMap(), options);
     }
+    public JsonNode getAllNumberCountsCompact() { return getAllNumberCountsCompact(RequestOptions.DEFAULT); }
+    public JsonNode getAllNumberCountsCompact(RequestOptions options) { return transport.request("activation.getAllNumberCountsCompact", Map.of(), options); }
+    public JsonNode getCountryNumberCountsCompact(Requests.ActivationGetCountryNumberCountsCompact params) { return getCountryNumberCountsCompact(params, RequestOptions.DEFAULT); }
+    public JsonNode getCountryNumberCountsCompact(Requests.ActivationGetCountryNumberCountsCompact params, RequestOptions options) {
+        if(params==null) throw new ValidationException("Request parameters must not be null");
+        return transport.request("activation.getCountryNumberCountsCompact", params.toMap(), options);
+    }
     public JsonNode getServicePrice(Requests.ActivationGetServicePrice params) { return getServicePrice(params, RequestOptions.DEFAULT); }
     public JsonNode getServicePrice(Requests.ActivationGetServicePrice params, RequestOptions options) {
         if(params==null) throw new ValidationException("Request parameters must not be null");
