@@ -1,6 +1,6 @@
 # SMSPVA Java SDK
 
-Official Java client for [SMSPVA](https://smspva.com/), a service for receiving verification SMS, renting phone numbers and renting private email addresses. Covers all 58 methods in Activation V2 (22), Rental (22) and Private Email (14). Requires Java 17 or later and uses Jackson and Apache HttpClient 5. This is a synchronous alpha release. Alternative API is excluded.
+Official Java client for [SMSPVA](https://smspva.com/), a service for receiving verification SMS, renting phone numbers and renting private email addresses. Covers all 61 methods in Activation V2 (25), Rental (22) and Private Email (14). Requires Java 17 or later and uses Jackson and Apache HttpClient 5. This is a synchronous alpha release. Alternative API is excluded.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Add the SDK dependency to your Maven project:
 <dependency>
   <groupId>com.smspva</groupId>
   <artifactId>smspva-sdk</artifactId>
-  <version>0.1.0-alpha.2</version>
+  <version>0.1.0-alpha.3</version>
 </dependency>
 ```
 
@@ -88,7 +88,7 @@ mvn install
 
 Generation reads the bundled contract and wire fixtures, then produces typed records and methods. A standalone source checkout already includes the generated files and builds without the documentation tree.
 
-Tests cover all 58 named methods and exact wire paths, HTTP verbs, parameters, auth and returned values. Local HTTP tests verify that redirects, cookies and automatic recovery of a disconnected paid GET are disabled. No production API request or purchase is made. The alpha has not been validated against paid production operations.
+Tests cover all 61 named methods and exact wire paths, HTTP verbs, parameters, auth and returned values. Local HTTP tests verify that redirects, cookies and automatic recovery of a disconnected paid GET are disabled. No production API request or purchase is made. The alpha has not been validated against paid production operations.
 
 The transport policy follows [Apache HttpClient's retry controls](https://hc.apache.org/httpcomponents-client-5.6.x/5.6.5/httpclient5/apidocs/org/apache/hc/client5/http/impl/classic/HttpClientBuilder.html); JSON handling uses [Jackson](https://github.com/FasterXML/jackson).
 
@@ -115,3 +115,9 @@ var uaCounts = client.activation().getCountryNumberCountsCompact(
 Both requests use GET and the account API key in the `apikey` header. Country codes are case-insensitive; an unknown country returns `data: []`. No extra query parameters are required. Results are cached by the API for 60 seconds, independently for all countries and for each country.
 
 The SDK preserves `Operator`, `Country`, `Services`, `Rating` and `ServiceRatings` exactly as returned, including negative counts and missing or invalid ratings. It does not insert computed rating fields. For non-`Donor*` operators, the effective rating is 1. For `Donor*` operators, use a service rating if it is an integer from 1 to 10, then a valid overall rating; otherwise the rating is undefined. Lower is better.
+
+## Receive another SMS on a previously used number
+
+Call the Activation methods in this order: `repeatNumber`, `getPhoneStatus`, `startSms`, `receiveSms`. Use a number previously paid for on the same service and carry the new order ID through the remaining calls. Request a new code in the target service after starting SMS reception.
+
+HTTP 202 with NUMBER_NOT_READY includes retryAfter in seconds. For PHONE_NOT_READY, wait five seconds. Wait 30 seconds between SMS checks while the order is active. Receiving a new paid SMS can incur a charge. If the number request has an uncertain outcome, inspect current orders before retrying.

@@ -26,4 +26,4 @@ requests+='}\n';
 await writeFile(new URL('Requests.java',source),requests);
 await writeFile(new URL('src/main/resources/com/smspva/sdk/contracts.json',root),JSON.stringify(manifest,null,2)+'\n');
 await writeFile(new URL('src/test/resources/cases.json',root),await readFile(new URL('../src/test/resources/cases.json',import.meta.url)));
-console.log('Generated Java request records and all 58 named methods.');
+console.log('Generated Java request records and all 61 named methods.');
