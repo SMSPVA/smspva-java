@@ -86,6 +86,28 @@ public final class Requests {
             return values;
         }
     }
+    public record ActivationRepeatNumber(String number, String service) implements Params {
+        public Map<String,Object> toMap() {
+            Map<String,Object> values=new LinkedHashMap<>();
+            values.put("number", number);
+            values.put("service", service);
+            return values;
+        }
+    }
+    public record ActivationGetPhoneStatus(Long orderid) implements Params {
+        public Map<String,Object> toMap() {
+            Map<String,Object> values=new LinkedHashMap<>();
+            values.put("orderid", orderid);
+            return values;
+        }
+    }
+    public record ActivationStartSms(Long orderid) implements Params {
+        public Map<String,Object> toMap() {
+            Map<String,Object> values=new LinkedHashMap<>();
+            values.put("orderid", orderid);
+            return values;
+        }
+    }
     public record ActivationReceiveSms(Long orderid, String partnerkey) implements Params {
         public Map<String,Object> toMap() {
             Map<String,Object> values=new LinkedHashMap<>();

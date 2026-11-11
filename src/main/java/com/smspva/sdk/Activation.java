@@ -68,6 +68,21 @@ public final class Activation {
         if(params==null) throw new ValidationException("Request parameters must not be null");
         return transport.request("activation.getNumberByOperator", params.toMap(), options);
     }
+    public JsonNode repeatNumber(Requests.ActivationRepeatNumber params) { return repeatNumber(params, RequestOptions.DEFAULT); }
+    public JsonNode repeatNumber(Requests.ActivationRepeatNumber params, RequestOptions options) {
+        if(params==null) throw new ValidationException("Request parameters must not be null");
+        return transport.request("activation.repeatNumber", params.toMap(), options);
+    }
+    public JsonNode getPhoneStatus(Requests.ActivationGetPhoneStatus params) { return getPhoneStatus(params, RequestOptions.DEFAULT); }
+    public JsonNode getPhoneStatus(Requests.ActivationGetPhoneStatus params, RequestOptions options) {
+        if(params==null) throw new ValidationException("Request parameters must not be null");
+        return transport.request("activation.getPhoneStatus", params.toMap(), options);
+    }
+    public JsonNode startSms(Requests.ActivationStartSms params) { return startSms(params, RequestOptions.DEFAULT); }
+    public JsonNode startSms(Requests.ActivationStartSms params, RequestOptions options) {
+        if(params==null) throw new ValidationException("Request parameters must not be null");
+        return transport.request("activation.startSms", params.toMap(), options);
+    }
     public JsonNode receiveSms(Requests.ActivationReceiveSms params) { return receiveSms(params, RequestOptions.DEFAULT); }
     public JsonNode receiveSms(Requests.ActivationReceiveSms params, RequestOptions options) {
         if(params==null) throw new ValidationException("Request parameters must not be null");

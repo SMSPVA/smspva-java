@@ -78,7 +78,7 @@ public final class SmsPva implements AutoCloseable {
         if(value instanceof Number number) {
             if(schema.has("minimum") && number.longValue()<schema.get("minimum").longValue() || schema.has("maximum") && number.longValue()>schema.get("maximum").longValue()) throw new ValidationException("Out-of-range parameter: "+name);
         } else if(value instanceof String text) {
-            if(schema.has("minLength") && text.length()<schema.get("minLength").asInt() || schema.has("maxLength") && text.length()>schema.get("maxLength").asInt() || schema.has("pattern") && !java.util.regex.Pattern.compile(schema.get("pattern").asText()).matcher(text).find()) throw new ValidationException("Invalid parameter value: "+name);
+            if(schema.has("minLength") && text.length()<schema.get("minLength").asInt() || schema.has("maxLength") && text.length()>schema.get("maxLength").asInt() || schema.has("pattern") && !java.util.regex.Pattern.compile(schema.get("pattern").asText()).matcher(text).matches()) throw new ValidationException("Invalid parameter value: "+name);
         }
     }
     JsonNode request(String operation, Map<String,Object> input, RequestOptions options) {
@@ -131,13 +131,14 @@ public final class SmsPva implements AutoCloseable {
         if(!code.isIntegralNumber() && !code.isTextual()) code=status.isIntegralNumber()?status:IntNode.valueOf(received.status());
         if(received.status()<200 || received.status()>=300) throw new ApiException(family,operation,received.status(),code,result);
         if(!status.isIntegralNumber()) throw new ProtocolException(family,operation,received.status());
-        if(op.path("pending").asBoolean() && received.status()==202 && exactCode(status,202) && isPending(result)) return result;
+        if(op.path("pending").asBoolean() && received.status()==202 && exactCode(status,202) && isPendingType(result, op.path("pendingType").asText("SMS_NOT_YET_RECEIVED"))) return result;
         if(op.path("noStock").asBoolean() && received.status()==200 && exactCode(status,2)) return result;
         if(family.equals("activation") ? !exactCode(status,200) || result.hasNonNull("error") : !exactCode(status,1)) throw new ApiException(family,operation,received.status(),code,result);
         return result;
     }
     private static boolean exactCode(JsonNode code, int expected) { return code.isIntegralNumber() && code.bigIntegerValue().equals(java.math.BigInteger.valueOf(expected)); }
-    public static boolean isPending(JsonNode response) { return response!=null && exactCode(response.path("statusCode"),202) && response.path("error").path("type").asText().equals("SMS_NOT_YET_RECEIVED"); }
+    public static boolean isPending(JsonNode response) { return isPendingType(response, "SMS_NOT_YET_RECEIVED"); }
+    private static boolean isPendingType(JsonNode response, String pendingType) { return response!=null && exactCode(response.path("statusCode"),202) && response.path("error").path("type").asText().equals(pendingType); }
     public static boolean isNoStock(JsonNode response) { return response!=null && exactCode(response.path("status"),2); }
     @Override public void close() {
         try { http.close(); } catch(IOException e) { throw new TransportException("client","close","network",false); }

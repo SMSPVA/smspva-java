@@ -54,7 +54,7 @@ class SdkTest {
         }
         return (JsonNode)resource.getClass().getMethod(method,request).invoke(resource,request.getDeclaredConstructor(types).newInstance(values));
     }
-    @Test void all58NamedMethodsPreserveWireAndJsonValues() throws Exception {
+    @Test void all61NamedMethodsPreserveWireAndJsonValues() throws Exception {
         Fake http=new Fake(); JsonNode contracts=contracts();
         try(SmsPva client=new SmsPva(SECRET,Duration.ofSeconds(30),http,Map.of())) {
             for(JsonNode item:cases()) {
@@ -79,7 +79,7 @@ class SdkTest {
                 assertEquals(item.get("family").asText().equals("activation") && auth?SECRET:null,request.headers().get("apikey"));
                 assertFalse(request.toString().contains(SECRET));
             }
-            assertEquals(58,http.requests.size());
+            assertEquals(61,http.requests.size());
         }
     }
     @Test void pendingAndNoStockRemainNormalResults() {
@@ -87,6 +87,10 @@ class SdkTest {
         try(SmsPva client=new SmsPva(SECRET,Duration.ofSeconds(30),http,Map.of())) {
             http.status=202; http.body="{\"statusCode\":202,\"error\":{\"type\":\"SMS_NOT_YET_RECEIVED\"}}";
             assertTrue(SmsPva.isPending(client.activation().receiveSms(new Requests.ActivationReceiveSms(123L,null))));
+            http.body="{\"statusCode\":202,\"error\":{\"type\":\"NUMBER_NOT_READY\",\"description\":\"Wait\"},\"retryAfter\":17}";
+            assertEquals(17,client.activation().repeatNumber(new Requests.ActivationRepeatNumber("01234","opt164")).path("retryAfter").asInt());
+            http.body="{\"statusCode\":202,\"error\":{\"type\":\"PHONE_NOT_READY\",\"description\":\"Wait\"}}";
+            assertEquals("PHONE_NOT_READY",client.activation().getPhoneStatus(new Requests.ActivationGetPhoneStatus(123L)).path("error").path("type").asText());
             http.status=200; http.body="{\"status\":2}";
             assertTrue(SmsPva.isNoStock(client.email().createOrder(new Requests.EmailCreateOrder("test","week",1L,null))));
         }
